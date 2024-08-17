@@ -1,0 +1,30 @@
+<html>
+    <head>
+	<title>
+	    The Simpsons Bowling on alex9532.github.io
+	</title>
+        <style>
+            body, html {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+    </head>
+    <body onload = "howTo()" >
+        <div style="width:100%;height:100%;max-width:100%">
+            <div id="game"></div>
+        </div>
+	<script>
+	    function howTo() {
+	      alert("To make the game work, you'll need to wait until it says bad, then hold F2 and click F3 while holding F2. Keep holding F2 until you see Initializing EEPROM...");
+	    }
+	</script>
+        <script>
+            EJS_player = "#game";
+            EJS_core = "fbneo";
+            EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
+            EJS_gameUrl = "https://alex9532.github.io/simpbowl2.zip";
+        </script>
+        <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
+    </body>
+</html>
