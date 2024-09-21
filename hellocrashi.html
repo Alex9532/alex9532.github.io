@@ -24,9 +24,10 @@
 <body>
 	<H1>HELLOCRASHI V3!</H1>
 	<H2>(may not work on mobile)</H2>
+	<button id="clickMe" type="button" onclick = "dotheCrashthing()">Click to start crashing</button>
 	<script>
-		document.getElementById("clickMe").onclick = fun;
-  		function fun() { 
+		document.getElementById("clickMe").onclick = dotheCrashthing;
+  		function dotheCrashthing() { 
 			
         		const times = 9999;
 			confirm("Are you sure? This could crash your browser, although we have safeguards in place meaning it won't start again on restart.")
@@ -48,7 +49,7 @@
 		}
 	</script>
 
-	<button id="clickMe" type="button" onclick = "fun()">Click to start crashing</button>
+	
  
 </body>
 </html>
