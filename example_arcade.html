@@ -30,13 +30,13 @@
     <script type="text/javascript">
       var emulator = new Emulator(document.querySelector("#canvas"),
                                   null,
-                                  new JSMAMELoader(JSMAMELoader.driver("targ"),
+                                  new JSMAMELoader(JSMAMELoader.driver("konamigv"),
                                                    JSMAMELoader.nativeResolution(256, 256),
                                                    JSMAMELoader.scale(3),
-                                                   JSMAMELoader.emulatorJS("emulators/jsmess/mameexidy.js"),
-                                                   JSMAMELoader.mountFile("targ.zip",
+                                                   JSMAMELoader.emulatorJS("simpbowl.js"),
+                                                   JSMAMELoader.mountFile("simpbowl-269.zip",
                                                                           JSMAMELoader.fetchFile("Game File",
-                                                                                                 "examples/targ.zip"))))
+                                                                                                 "simpbowl-269.zip"))))
       emulator.start({ waitAfterDownloading: true });
     </script>
   </body>
