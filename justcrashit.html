@@ -1,5 +1,7 @@
-<script type="text/javascript"> 
-function CrashAndBurn(url) { popupWindow = window.open( url,'popUpWindow', 'height=181,width=666,left=3,top=222') }
-</script> 
-<body onload="JavaScript:CrashAndBurn(self.location,'_blank');JavaScript:CrashAndBurn(self.location,'_blank');JavaScript:CrashAndBurn(self.location,'_blank');JavaScript:CrashAndBurn(self.location,'_blank');JavaScript:CrashAndBurn(self.location,'_blank');JavaScript:CrashAndBurn(self.location,'_blank');JavaScript:CrashAndBurn(self.location,'_blank');JavaScript:CrashAndBurn(self.location,'_blank');JavaScript:CrashAndBurn(self.location,'_blank');JavaScript:CrashAndBurn(self.location,'_blank');">
+onbeforeunload = () => true;
 
+if(confirm("Do you REALLY want to crash your browser?")){
+  setTimeout(function(){
+    while(1)location.reload(1)
+  }, 1000)
+}
