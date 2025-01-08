@@ -1,0 +1,897 @@
+
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://engaging-data.com/wordle4.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" ></script>
+        <script src='https://engaging-data.com/pages/scripts/arrayfunctions.js'></script>
+        <script src='https://engaging-data.com/words.js'></script>
+        <script src='https://engaging-data.com/townshipwords.js'></script>
+        <script src='https://engaging-data.com/scrabblewords.js'></script>
+        <script src='https://engaging-data.com/wordle.js'></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+        <div id="mainstart" class="hide popup">
+            <b>WORD-GUESSR</b>
+            <div>Try to guess the correct word in 6 tries. Each guess is submitted by pressing the 'ENTER' key.
+            Once the guess is submitted, each correct letter in the correct position is shown in green <span id="green">G</span>, 
+            each correct letter in the incorrect position is shown in orange <span id="orange">O</span> and letters that are not
+            in the word show up in black <span id="black">B</span>.</div>
+            <br><br>
+            <div>
+                    Start game with 
+                    <select id="pickwordlength" name="select" >
+                        <option value="3" >3</option>
+                        <option value="4" >4</option>
+                        <option value="5" selected>5</option>
+                        <option value="6" >6</option>
+                        <option value="7" >7</option>
+                        <option value="rand" >random</option> 
+                         
+                </select>
+                -letter word and start guessing.<br><br>
+                <button  class="startgame" onclick="startGame();" >Start Game</button>
+                <br>&nbsp;<br>
+                <button  id="challengegame" onclick="genChallenge();" >Generate Challenge Game</button>
+            </div>
+    
+        </div>
+        <div id="iconcontainer">
+            <div id="instructions" class="topicon"><i class="fa fa-info-circle"></i></div>
+            <div id="statsicon" class="topicon"><i class="fa fa-bar-chart" aria-hidden="true"></i></div>
+        </div>
+        <div id="instructpop" class="hide popup">
+            <b>WORD-GUESSR</b>
+            <div>Try to guess the correct word in 6 tries. Each guess is submitted by pressing the 'ENTER' key.
+            Once the guess is submitted, each correct letter in the correct position is shown in green <span id="green">G</span>, 
+            each correct letter in the incorrect position is shown in orange <span id="orange">O</span> and letters that are not
+            in the word show up in black <span id="black">B</span>.</div>
+            <br>
+            
+            <br>
+            <button id="close" onclick="$('#instructpop').hide();">X</button>
+            
+        </div>
+        <div id="challengestart" class="hide popup">
+            <b>WORD-GUESSR</b>
+            <div>This is a challenge to play with friends who have shared this link.
+            <br> <br>Try to guess the correct <span id="challengelength"></span> word in 6 tries. Each guess is submitted by pressing the 'ENTER' key.
+            Once the guess is submitted, each correct letter in the correct position is shown in green <span id="green">G</span>, 
+            each correct letter in the incorrect position is shown in orange <span id="orange">O</span> and letters that are not
+            in the word show up in black <span id="black">B</span>.</div>
+            <br>
+            <br>
+            <button  class="startgame" onclick="startGame(word);" >Start Challenge Game</button>
+            <br>
+            
+        </div>
+
+        <div id="customstart" class="hide popup">
+            <b>WORD-GUESSR</b>
+            <div>This is a custom WordGuessr game (<span class="customname"></span>) with a special word list.
+            <br> <br>Try to guess the correct word in 6 tries. Each guess is submitted by pressing the 'ENTER' key.
+            Once the guess is submitted, each correct letter in the correct position is shown in green <span id="green">G</span>, 
+            each correct letter in the incorrect position is shown in orange <span id="orange">O</span> and letters that are not
+            in the word show up in black <span id="black">B</span>.</div>
+            <br>
+            <br>
+            <button  class="startgame" onclick="startGame(word);" >Start <span class="customname"></span> Game</button>
+            <br>
+            
+        </div>
+
+        <div id="challengeshare" class="hide popup">
+            <b>WORD-GUESSR Challenge</b>
+            <div>This is a challenge to play with friends by sharing this link. Everyone who clicks the link will get the same word to try and guess.
+            <br> <br><textarea id="linktxt"></textarea>
+            
+            </div>
+            <br>
+            <br>
+            <button  class="startgame" onclick="startChallengeGame();" >Start Challenge Game</button>
+            <br>
+            <button class="back" onclick="goToStart();">Back</button>
+            
+        </div>
+
+        <div id="endgame" class="hide popup">
+            <b>WORD-GUESSR</b>
+            <div>
+            <br><span id="resultsstring"></span></div>
+            <br>
+            <button  id="share" onclick="share()" >Share <span id="challengetxt"></span>Results</button>
+            <textarea id="sharearea"></textarea>
+
+            <button id="playagain" onclick="playAgainButton();" >Play Again</button>
+            <button id="showstats" onclick="showStats(wordLength);" >Show Stats (new!)</button>
+            
+            <br>
+            
+        </div>
+
+        <div id="stats" class="hide popup">
+            <b>WORD-GUESSR</b>
+            <br>Statistics
+            <div id="numberbar">
+                <div class="numbertab" id="s_3">3</div>
+                <div class="numbertab" id="s_4">4</div>
+                <div class="numbertab" id="s_5">5</div>
+                <div class="numbertab" id="s_6">6</div>
+                <div class="numbertab" id="s_7">7</div>
+                <div class="numbertab" id="s_All">All</div>
+            </div>
+            <div id="statsmessage">
+            <div class="statblock"><span id="games" class="statnum"></span><br><span >games played</span></div>
+            <div class="statblock"><span id="wins" class="statnum"></span><br><span >wins</span></div>
+            <div class="statblock"><span id="winpct" class="statnum"></span><br><span >win rate</span></div>
+            <div class="statblock"><span id="streak" class="statnum"></span><br><span >current streak</span></div>
+            <div class="statblock"><span id="beststreak" class="statnum"></span><br><span >best streak</span></div>
+            </div>
+            <br>
+            <div id="guessdisplay">
+                Guess Distribution
+                <div class="guesscontainer">1<div class="guessbar" id="g_1">0</div></div>
+                <div class="guesscontainer">2<div class="guessbar" id="g_2">0</div></div>
+                <div class="guesscontainer">3<div class="guessbar" id="g_3">0</div></div>
+                <div class="guesscontainer">4<div class="guessbar" id="g_4">0</div></div>
+                <div class="guesscontainer">5<div class="guessbar" id="g_5">0</div></div>
+                <div class="guesscontainer">6<div class="guessbar" id="g_6">0</div></div>
+            </div>
+            <button id="closestat" onclick="$('#stats').hide();">X</button>
+        </div>
+
+   
+        <div id="gamecontainer"></div>
+        <div id="keyboard">
+            <div id="keyboardrow3">
+                <div class="key" id="q" onclick="onKeyPress(this.id)">Q</div>
+                <div class="key" id="w" onclick="onKeyPress(this.id)">W</div>
+                <div class="key" id="e" onclick="onKeyPress(this.id)">E</div>
+                <div class="key" id="r" onclick="onKeyPress(this.id)">R</div>
+                <div class="key" id="t" onclick="onKeyPress(this.id)">T</div>
+                <div class="key" id="y" onclick="onKeyPress(this.id)">Y</div>
+                <div class="key" id="u" onclick="onKeyPress(this.id)">U</div>
+                <div class="key" id="i" onclick="onKeyPress(this.id)">I</div>
+                <div class="key" id="o" onclick="onKeyPress(this.id)">O</div>
+                <div class="key" id="p" onclick="onKeyPress(this.id)">P</div>
+            </div>
+            <div id="keyboardrow2">
+                <div class="key" id="a" onclick="onKeyPress(this.id)">A</div>
+                <div class="key" id="s" onclick="onKeyPress(this.id)">S</div>
+                <div class="key" id="d" onclick="onKeyPress(this.id)">D</div>
+                <div class="key" id="f" onclick="onKeyPress(this.id)">F</div>
+                <div class="key" id="g" onclick="onKeyPress(this.id)">G</div>
+                <div class="key" id="h" onclick="onKeyPress(this.id)">H</div>
+                <div class="key" id="j" onclick="onKeyPress(this.id)">J</div>
+                <div class="key" id="k" onclick="onKeyPress(this.id)">K</div>
+                <div class="key" id="l" onclick="onKeyPress(this.id)">L</div>    
+            </div>
+            <div id="keyboardrow1">
+                <div class="key" id="z" onclick="onKeyPress(this.id)">Z</div>
+                <div class="key" id="x" onclick="onKeyPress(this.id)">X</div>
+                <div class="key" id="c" onclick="onKeyPress(this.id)">C</div>
+                <div class="key" id="v" onclick="onKeyPress(this.id)">V</div>
+                <div class="key" id="b" onclick="onKeyPress(this.id)">B</div>
+                <div class="key" id="n" onclick="onKeyPress(this.id)">N</div>
+                <div class="key" id="m" onclick="onKeyPress(this.id)">M</div>   
+            </div>
+            <div id="keyboardrow0">
+                <div class="keylong" id="Enter" onclick="onKeyPress(this.id)">Enter</div>
+                <div class="keylong" id="Backspace" onclick="onKeyPress(this.id)">Delete</div>
+            </div>
+        </div>
+        <div id="continue" hidden><button onclick="endGame()" id="continuebutton">Continue</button></div>
+ 
+        <style>
+            
+
+
+        </style>
+        <script>
+            tries=6;
+            wordLength=6;
+            letters=['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
+            wordlistlengths=[300,1580,2315,4865,4060];
+
+            function endGame(){
+              
+                    
+                // }
+                $('#endgame').show();
+                $('#continue').hide();
+            }
+            function getCode(){
+                if ($('#pickwordlength option:selected').val()=='rand'){
+                    wordLength=Math.floor(Math.random()*4.8+3);
+                } else {
+                    wordLength=parseInt($('#pickwordlength option:selected').val());
+                }       
+                
+                index=wordLength-3;
+                
+                challengecode="?challenge="+letters[Math.floor(Math.random()*26)]+letters[Math.floor(Math.random()*26)]+letters[Math.floor(Math.random()*26)]+wordLength;
+                console.log(challengecode);
+                return challengecode
+            }
+            function getCustomCode(){
+                
+                customcode="?custom="+customname+"_"+letters[Math.floor(Math.random()*26)]+letters[Math.floor(Math.random()*26)]+letters[Math.floor(Math.random()*26)];
+                console.log(customcode);
+                return customcode
+            }
+
+            function goToStart(){
+                $(".popup").hide();
+                $("#mainstart").show()
+
+            }
+            function genChallenge(){
+                $("#mainstart").hide()
+                $("#challengeshare").show()
+                
+                challengecode=getCode();
+                joinstring=`Play this WordGuessr (Wordle clone) Challenge with the same puzzle as me at 
+`;
+                // baseurl=urlstring.split("?")[0]
+                urlstring=thisURL.split("?")[0];
+                urlstring+=challengecode;
+                console.log(urlstring);
+
+                showTextandCopyToClipboard(joinstring+urlstring,'linktxt')
+                // copyToClipboard(joinstring+urlstring)
+                // $("#linktxt").html(joinstring+urlstring);
+                // history.pushState("", "", urlstring);
+                // window.parent.history.pushState("", "", urlstring);
+
+            }
+
+            function startBlankGame(){
+                $("#mainstart").show();
+                challenge=false;
+                custom=false;
+            }
+
+            function parseURL(){
+                isInIframe = (parent !== window);
+                if (isInIframe){
+                     thisURL = document.referrer;
+                    //  console.log(thisURL)
+                } else{
+                     thisURL = window.location.href;     
+                    //  console.log(thisURL)
+                }
+                // console.log(thisURL);
+                parseUrl = new URL(thisURL);
+
+                chalparamval=parseUrl.searchParams.get('challenge');
+                custparamval=parseUrl.searchParams.get('custom');
+
+                // console.log(chalparamval,custparamval)
+                if (chalparamval!==null){
+                    challenge=true;
+                    custom=false;
+                    console.log(chalparamval)
+                    challengecode="?challenge="+chalparamval;
+                    //show popup for challenge
+                    $("#challengestart").show();
+                    parseCode(chalparamval);
+                } else if (custparamval!==null){
+                    custom=true;
+                    challenge=false;
+                    console.log(custparamval)
+                    parseCustomNameandCode(custparamval);
+                    //show popup for challenge
+                    if (typeof customwordlist=='undefined'){
+                        $("#mainstart").show();
+                        challenge=false;
+                        custom=false;
+                    } else {
+                        $("#customstart").show();
+                        $(".customname").html(customnameCap)
+                    }
+                    
+                    
+                } else{
+                    startBlankGame();
+                }
+            }
+            
+            function parseCustomNameandCode(nameandcode){
+                console.log(nameandcode)
+                customwords={'township':townshipwords,'wordlelist':wordlewords}
+                customname=nameandcode.split("_")[0];
+                code=nameandcode.split("_")[1]
+                console.log(code)
+                customname=customname.toLowerCase()
+                customnameCap=customname[0].toUpperCase() + customname.slice(1);
+                customwordlist=customwords[customname];
+                if (typeof customwordlist=='undefined'){
+                    //check if custom game name is valid
+                    startBlankGame();
+                } else {
+                    wordlistsize=customwordlist.length
+                    if (code==null){
+                        console.log('no code')
+                        //get random word
+                        customcode=getCustomCode();
+                        console.log(customcode)
+                        code=customcode.split("_")[1];
+
+                    } else {
+                        customcode="?custom="+nameandcode;
+                    }
+                        
+                    number=convertCode(code);
+                    wordind=number%wordlistsize;
+                    word=customwordlist[wordind];
+                    wordLength=word.length;
+                }
+            }
+
+            function parseCode(code){
+                //parseURL
+                // example="qje6";
+                
+                //check code for validity (3 letters and one number)
+                // code=example;
+                wordLength=parseInt(code.slice(3,4));
+                number=convertCode(code);
+                wordlistsize=wordlistlengths[wordLength-3]
+                wordind=number%wordlistsize;
+                // wordlist=window["words"+wordLength];
+                pickWord(wordLength)
+                word=wordlist[wordind]
+                console.log(word)
+                // console.log(number,wordlistsize,wordind,word);
+                
+                
+            }
+
+            function convertCode(code){
+                l1=code.slice(0,1);
+                l2=code.slice(1,2);
+                l3=code.slice(2,3);
+                n1=letters.indexOf(l1);
+                n2=letters.indexOf(l2);
+                n3=letters.indexOf(l3);
+
+                number=26*26*n1+26*n2+n3;
+                console.log(l1,l2,l3,n1,n2,n3,number)
+                return number
+            }
+
+            function startChallengeGame(){
+                challenge=true;
+                console.log(challengecode);
+                code=challengecode.split('=')[1]
+                baseurl=thisURL.split("?")[0]
+                urlstring=baseurl+challengecode;
+                console.log(urlstring);
+                if (isInIframe){
+                    window.parent.history.pushState("", "", urlstring);
+                    
+                } else {
+                    history.pushState("", "", urlstring);
+                }
+                
+                console.log(code);
+                parseCode(code);
+                startGame(word);
+            }
+            function startGame(startword){
+                won=false;
+                gamehistory=[];
+                $(".popup").hide();
+                
+                $("#sharearea").hide();
+                //get word
+
+                if (typeof startword == 'undefined'){
+                    clearURLparams();
+                    //generate code and the get word
+                    challengecode=getCode();
+                    parseCode(challengecode.split('=')[1]);
+                } else {
+                    
+                    word=startword;
+                    // console.log(word)
+                }
+                
+                makeBoard();
+                
+                // $("#playagain").hide();
+                
+                wordarr=word.toUpperCase().split("");
+                row=1;
+                tile=0;
+                guess="";
+                gameover=false;
+
+                // $( "#instructions" ).hover(
+                //     function() {
+                //         //hover
+                //         $("#instructpop").show();
+                //     }, function() {
+                //        //unhover
+                //        $("#instructpop").hide();
+                //     }
+                // );
+                $( "#instructions" ).click(function() {
+                    $("#instructpop").show();
+                });
+                
+                // $( ".numbertab" ).click(function() {
+                //     console.log(this);
+                // });
+
+                $( "#statsicon" ).click(function() {
+                    $("#stats").show();
+                    showStats(wordLength);
+                });
+            }
+
+            // startGame();
+            function onKeyPress(key){
+                if (!gameover){
+                    // console.log(event.key);
+                    if (isLetter(key)){
+                        letter =key.toUpperCase();
+                        if(tile<wordLength){
+                            tile++;
+                            guess=guess+letter;
+                            $("#r"+row+"l"+tile).html(letter.toUpperCase());
+                        }  
+                        // console.log(row,tile,letter)
+                    } else if (key=="Backspace"){   
+                        $("#r"+row+"l"+tile).html("&nbsp;");
+                        guess=guess.slice(0,-1);
+                        if(tile>0){
+                            tile--;
+                        }
+                        // console.log('Backspace')
+                    } else if (key=="Enter"){
+                        // console.log('Enter')
+                        if (guess.length==wordLength){
+                            if (isWord(guess)){
+                                won=checkGuess(guess);
+
+                                if (won){
+                                    numtries=row;
+                                }
+                                if (row==tries){
+                                    gameover=true;
+                                }
+                                row++;
+                                guess="";
+                                tile=0;
+                                for (var j=0;j<wordLength;j++){
+                                    $("#r"+(row)+"l"+(j+1)).toggleClass('upcoming');
+                                }
+                                if (gameover){
+                                    if (!won){
+                                        // $("#answer").html(word);
+                                        $("#resultsstring").html("The word is "+ word);
+                                    } else {
+                                        $("#resultsstring").html(`You got it in ${numtries} ${(numtries==1?"guess":"guesses")}!`);
+                                        if (challenge){
+                                            $("#challengetxt").text('Challenge')
+                                        } else {
+                                            $("#challengetxt").text('')
+                                        }
+                                        // $("#endgame").show();
+                                        // $("#resultsstring").html(`You got it in ${numtries} ${(numtries==1?"guess":"guesses")}!`);
+                                    }
+                                    updateCounter();
+                                    updateStats()
+                                    $("#continue").show();
+                                }
+                            } else {
+                                notWord();
+                            }
+                        }
+                    }                    
+                    // console.log(tile)
+                } else {
+                    // console.log("gameover")
+                }
+            }
+            $(this).on('keydown', function(event) {
+                // console.log(event.key)
+                onKeyPress(event.key)
+                
+            })
+            function updateCounter(){
+        
+                $.ajax({
+                    type: "GET",
+                    url: "gamecount.php"
+                });
+            
+            }
+            function clearKeyboard(){
+                for (letter of letters){
+                    $("#"+letter).removeClass("none place correct")
+                }
+                
+            }
+            function notWord(){
+                $("#row"+(row)+" #notword").show()
+                setTimeout(function(a){$("#row"+(row)+" #notword").hide()},1000);
+                $('#row'+row).toggleClass('rowshrink')
+                setTimeout(function(a){$('#row'+row).toggleClass('rowshrink')},700);
+                
+            };
+            function setLength(num){
+                console.log(num)
+            }
+            function clearURLparams(){
+                baseurl=thisURL.split("?")[0]
+                    console.log(baseurl)
+                if (isInIframe){
+                    window.parent.history.pushState("", "", baseurl);
+                } else {
+                    history.pushState("", "", baseurl);
+                }
+                    
+            }
+
+            function isWord(guess){
+                return (scrabblewords.includes(guess.toLowerCase())|| wordlist.includes(guess.toLowerCase()));
+                // return (scrabblewords.includes(guess.toLowerCase())|| biowords.includes(guess.toLowerCase()));
+            }
+            function makeBoard(){
+                $( "#gamecontainer" ).empty();
+                for (var i=0;i<tries;i++){
+                    $("#gamecontainer").append('<div class="row" id="row'+(i+1)+'"><div id="notword">Not a word</div></div>');
+                    $("#row"+(i+1)+" #notword").hide()
+                    
+                    for (var j=0;j<wordLength;j++){
+                        if (wordLength>=8){
+                            $("#row"+(i+1)).append(`<div class="letter letternarrow" id="r${(i+1)}l${(j+1)}">&nbsp;</div>`);
+                        } else {
+                          $("#row"+(i+1)).append(`<div class="letter" id="r${(i+1)}l${(j+1)}">&nbsp;</div>`);
+                        }
+                        if (i>0){
+                            $("#r"+(i+1)+"l"+(j+1)).addClass('upcoming');
+                        }  
+                    }
+                }
+            }
+            function initStats(){
+                if (typeof localStorage.gameStats == 'undefined'){
+                    gameStats={
+                        winDist:[[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]],
+                        games:[0,0,0,0,0,0],
+                        losses:[0,0,0,0,0,0],
+                        wins:[0,0,0,0,0,0],
+                        streak:[0,0,0,0,0,0],
+                        beststreak:[0,0,0,0,0,0],
+                        winpct:[0,0,0,0,0,0]
+                    }
+                    localStorage.gameStats=JSON.stringify(gameStats);
+                    
+                    // localStorage.winDist=JSON.stringify([[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]]);
+                    // localStorage.games=JSON.stringify([0,0,0,0,0]);
+                    // localStorage.losses=JSON.stringify([0,0,0,0,0]);
+                    // localStorage.wins=JSON.stringify([0,0,0,0,0]);
+                    // localStorage.streak=JSON.stringify([0,0,0,0,0]);
+                    // localStorage.winpct=JSON.stringify([0,0,0,0,0]);
+                }
+                gameStats=JSON.parse(localStorage.gameStats);
+
+                $( ".numbertab" ).on( "click", function() {
+                    shownum= $( this ).text();
+                    // console.log(shownum);
+                    showStats(shownum);
+                });
+            }
+
+            function writeStats(numletters){
+                $("#games").html(gameStats.games[numletters-3]);
+                $("#wins").html(gameStats.wins[numletters-3]);
+                $("#winpct").html(gameStats.winpct[numletters-3]+"%");
+                $("#streak").html(gameStats.streak[numletters-3]);
+                $("#beststreak").html(gameStats.beststreak[numletters-3]);
+
+                minwidth=4;
+                maxwidth=95;
+                for (var i=0;i<6;i++){
+                    maxlength=maxArray(gameStats.winDist[numletters-3]);
+                    if(maxlength==0){
+                        maxlength=1;
+                    }
+                    tmpwidth=gameStats.winDist[numletters-3][i]/maxlength*maxwidth+minwidth;
+                    // console.log(tmpwidth);
+                    $("#g_"+(i+1)).width(tmpwidth+"%");
+                    $("#g_"+(i+1)).html(gameStats.winDist[numletters-3][i])
+                }
+                $(".guessbar").removeClass('hlguessbar');
+                
+                if (numletters==wordLength||numletters==8){
+                    if (won){
+                        $("#g_"+numtries).addClass('hlguessbar');
+                    }
+                }
+                
+                
+            }
+
+            function updateStats(){
+                allindex=5;
+                if (!custom){
+                    gameStats=JSON.parse(localStorage.gameStats);
+                    gameStats.games[wordLength-3]++;
+                    gameStats.games[allindex]++;
+                    if (won){
+                        gameStats.wins[wordLength-3]++;
+                        gameStats.wins[allindex]++;
+                        gameStats.streak[wordLength-3]++;
+                        gameStats.streak[allindex]++;
+                        if (gameStats.streak[wordLength-3]>gameStats.beststreak[wordLength-3]){
+                            gameStats.beststreak[wordLength-3]=gameStats.streak[wordLength-3];
+                        }
+                        if (gameStats.streak[allindex]>gameStats.beststreak[allindex]){
+                            gameStats.beststreak[allindex]=gameStats.streak[allindex];
+                        }
+                        gameStats.winDist[wordLength-3][numtries-1]++
+                        gameStats.winDist[allindex][numtries-1]++
+                    } else{
+                        gameStats.losses[wordLength-3]++;
+                        gameStats.losses[allindex]++;
+                        gameStats.streak[wordLength-3]=0;
+                        gameStats.streak[allindex]=0;
+                    }
+                    gameStats.winpct[wordLength-3]=Math.round(gameStats.wins[wordLength-3]/gameStats.games[wordLength-3]*100);
+                    gameStats.winpct[allindex]=Math.round(gameStats.wins[allindex]/gameStats.games[allindex]*100);
+                    localStorage.gameStats=JSON.stringify(gameStats);
+                    console.log(gameStats);
+                    
+                    
+                    
+
+                }
+                
+
+            }
+            function showStats(num){
+                // console.log(num);
+                if (num=="All"){
+                    writeStats(8);
+                } else {
+                    writeStats(num);
+                }
+                $("#stats").show();
+                $(".numbertab").removeClass('highlight');
+                $("#s_"+num).addClass('highlight');
+                
+                
+            }
+            
+
+            function playAgainButton(){
+                $(".popup").hide();
+                // $("#playagain").hide();
+                if (custom){
+                    
+                    customGameURLnoCode=thisURL.split("_")[0];
+                    console.log(customGameURLnoCode);
+                    if (isInIframe){
+                        window.parent.history.pushState("", "", customGameURLnoCode);
+                        // console.log(window.parent.history);
+                    } else {
+                        history.pushState("", "", customGameURLnoCode);
+                    }
+                    
+                    $("#customstart").show();
+                    parseCustomNameandCode(customname);
+                    // setTimeout(function(){parseURL()},3000);
+                } else {
+                    $("#mainstart").show();
+                }
+
+                clearKeyboard();
+            }
+            function checkGuess(guess){
+
+                // $( "" ).removeClass( "myClass yourClass" )
+
+                guessarr=guess.split("");
+                guessarr2=guessarr.slice();
+                wordarr2=wordarr.slice();
+
+                colorarr=fillArray(wordLength,0);
+                
+                for (var i=0;i<guessarr.length;i++){
+                    //check for correct letter placement first
+                    if (guessarr[i]==wordarr[i]){
+                        colorarr[i]=1;
+                        guessarr2[i]='*';
+                        wordarr2[i]='&';
+                        console.log("letter correct"+guessarr[i])
+                        $("#"+guessarr[i].toLowerCase()).addClass('correct');
+                    } 
+                }
+                for (var i=0;i<guessarr.length;i++){
+                    if (colorarr[i]==1){
+
+                    } else if (wordarr2.includes(guessarr2[i])){
+                        colorarr[i]=-1;
+                        tmploc=wordarr2.indexOf(guessarr2[i]);
+                        guessarr2[i]='*'; 
+                        wordarr2[tmploc]='&';
+                        $("#"+guessarr[i].toLowerCase()).addClass('place');
+                    } else {
+                        $("#"+guessarr[i].toLowerCase()).addClass('none');
+                    }
+                    // console.log(guessarr2,wordarr2)
+                }
+
+                
+                for (var i=0;i<guessarr.length;i++){
+                    $("#r"+row+"l"+(i+1)).removeClass("none place correct")
+
+                    $("#r"+row+"l"+(i+1)).html(guess[i].toUpperCase());
+                    if (colorarr[i]==0){
+                        code="none"
+                    } else if (colorarr[i]==-1){
+                        code="place"
+                    } else {
+                        code="correct"
+                    }
+                    $("#r"+row+"l"+(i+1)).addClass(code)
+                }
+                
+                // console.log(colorarr);
+                gamehistory.push(colorarr);
+                if (sumArray(colorarr)==wordLength){
+                    gameover=true;
+                    
+                    return true
+                    // alert("You Won!")
+                } else{
+                    return false
+                }
+                
+            }
+            
+
+        function isLetter(guess){    
+            return /^[A-Z]$/i.test(guess);
+        }
+        
+        function pickWord(length){
+            fraction=.66;
+            if (length==3){
+                wordlist=words3;
+                return words3[Math.floor(Math.random() * words3.length*.5)]
+            } else if (length==4){
+                wordlist=words4;
+                return words4[Math.floor(Math.random() * words4.length*fraction)]
+            } else if (length==5){
+                // wordlist=words5;
+                wordlist=wordlewords;
+                // console.log(wordlist)
+                return wordlist[Math.floor(Math.random() * wordlist.length*fraction)]
+            } else if (length==6){
+                wordlist=words6;
+                return words6[Math.floor(Math.random() * words6.length*fraction)]
+            } else if (length==7){
+                wordlist=words7;
+                return words7[Math.floor(Math.random() * words7.length*0.4)]
+            }
+        }
+
+        function share(){
+            
+            sharestring=`WordGuessr ${(custom?customnameCap:"")} Challenge 
+(${wordLength} letter) ${(won?numtries+"/6":"failed")}`
+            for (var i=0;i<gamehistory.length;i++){
+                sharestring+=`
+`
+                for (var j=0;j<wordLength;j++){
+                    sharestring+=getEmoji(gamehistory[i][j])
+                }
+            }
+            sharestring+=`
+Try the same exact puzzle here:
+`   
+            baseurl=thisURL.split("?")[0];
+            if (challenge){
+                urlstring=baseurl+challengecode;
+            } else if (custom){
+                urlstring=baseurl+customcode;
+            } else{
+                urlstring=thisURL+challengecode;
+            }
+            console.log(urlstring);
+            sharestring+=urlstring;
+            console.log("copying "+sharestring)
+            $("#sharearea").show();
+            showTextandCopyToClipboard(sharestring,'sharearea');
+            
+        }
+
+        function getEmoji(guess){
+            gbox='&#129001;'
+            obox="&#128999;"
+            bbox="&#11035;"
+            gbox='🟩'
+            obox="🟧"
+            bbox="⬛"
+
+            if (guess==1){
+                return gbox
+            } else if (guess==-1){
+                return obox
+            } else {
+                return bbox
+            }
+
+        }
+        function copyToClipboard(text) {
+            var $temp = $("<textarea></textarea>");
+            $("body").append($temp);
+            $temp.val(text).select();
+            document.execCommand("copy");
+            $temp.remove();
+        }
+        function copyLinkToClipboard(text) {  
+            $("#linktxt").val(text).select();
+            document.execCommand("copy");
+        }
+
+        function showTextandCopyToClipboard(text,id){
+            $("#"+id).val(text);
+            $("#"+id).select();
+            document.execCommand("copy");
+        }
+        function readTextFile(file)
+            {
+                var rawFile = new XMLHttpRequest();
+                rawFile.open("GET", file, false);
+                rawFile.onreadystatechange = function ()
+                {
+                    if(rawFile.readyState === 4)
+                    {
+                        if(rawFile.status === 200 || rawFile.status == 0)
+                        {
+                            allText = rawFile.responseText;
+                            console.log(allText);
+                        }
+                    }
+                }
+                rawFile.send(null);
+                
+            }
+        gameover=true;
+        initStats();
+        
+        parseURL();
+
+        makeBoard();
+
+
+
+        </script>
+
+        
+
+        
+
+
+
+    </body>
+</html>
