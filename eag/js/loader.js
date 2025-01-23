@@ -348,7 +348,7 @@
 		opts.gzip = window.__eaglercraftLoaderClient.gzip;
 		
 		initProgressScreen();
-		updateProgressScreen("Loading " + opts.name);
+		updateProgressScreen("Loading " + opts.name + " (by Alex)";
 		updateProgressBar("Please wait...", "", -1);
 		
 		if(!window.indexedDB) {
