@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Fullscreen Camera iOS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>True Fullscreen Camera</title>
 
 <style>
 html, body {
@@ -13,17 +13,17 @@ html, body {
     overflow: hidden;
 }
 
-/* Force true full screen /
+/* Container forced by JS /
 #container {
     position: fixed;
-    width: 100vw;
-    height: 100dvh; / KEY FIX /
     top: 0;
     left: 0;
+    width: 100vw;
     background: black;
+    overflow: hidden;
 }
 
-/ Video fills everything /
+/ Video fills container without distortion /
 video {
     width: 100%;
     height: 100%;
@@ -31,14 +31,14 @@ video {
     transform: scaleX(1);
 }
 
-/ Controls */
+/ Buttons /
 .controls {
     position: absolute;
     bottom: 40px;
     width: 100%;
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 12px;
     z-index: 10;
 }
 
@@ -58,35 +58,52 @@ button {
     <video id="video" autoplay playsinline muted></video>
 
     <div class="controls">
-        <button id="normalBtn">Start Camera</button>
-        <button id="mirrorBtn">Start Mirror</button>
+        <button id="normalBtn">Camera</button>
+        <button id="mirrorBtn">Mirror</button>
     </div>
 </div>
 
 <script>
+const container = document.getElementById('container');
 const video = document.getElementById('video');
 const normalBtn = document.getElementById('normalBtn');
 const mirrorBtn = document.getElementById('mirrorBtn');
 
+/ 🔑 REAL fullscreen fix /
+function setFullHeight() {
+    const h = window.innerHeight;
+    container.style.height = h + 'px';
+}
+setFullHeight();
+
+window.addEventListener('resize', setFullHeight);
+window.addEventListener('orientationchange', setFullHeight);
+
+/ 🎥 Start camera /
 async function startCamera(mirror) {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: "user"
-            },
+            video: { facingMode: "user" },
             audio: false
         });
 
         video.srcObject = stream;
-
-        // Mirror toggle
         video.style.transform = mirror ? "scaleX(-1)" : "scaleX(1)";
+
+        / 🔒 Try to lock orientation */
+        if (screen.orientation && screen.orientation.lock) {
+            try {
+                await screen.orientation.lock("portrait");
+            } catch (e) {
+                console.log("Orientation lock not supported here");
+            }
+        }
 
         normalBtn.style.display = "none";
         mirrorBtn.style.display = "none";
 
-    } catch (e) {
-        alert("Camera failed: " + e.message);
+    } catch (err) {
+        alert("Camera error: " + err.message);
     }
 }
 
