@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>iOS Fullscreen Camera</title>
+
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    background: black;
+    overflow: hidden;
+}
+
+/* Container fully controlled by JS */
+#container {
+    position: fixed;
+    inset: 0;
+    background: black;
+    overflow: hidden;
+}
+
+/* 🔑 Video pinned to actual screen edges */
+video {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    object-fit: cover;
+    background: black;
+
+    transform: scaleX(1);
+}
+
+/* Overlay controls */
+.controls {
+    position: fixed;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+
+    z-index: 10;
+}
+
+button {
+    padding: 14px 18px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255,255,255,0.92);
+}
+
+/* Info overlay */
+#info {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+
+    color: white;
+    font-size: 12px;
+    z-index: 10;
+    opacity: 0.8;
+
+    pointer-events: none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="container">
+    <video id="video" autoplay playsinline muted></video>
+
+    <div id="info"></div>
+
+    <div class="controls">
+        <button id="normalBtn">Start Camera</button>
+        <button id="mirrorBtn">Start Mirror</button>
+    </div>
+</div>
+
+<script>
+const video = document.getElementById('video');
+const info = document.getElementById('info');
+const normalBtn = document.getElementById('normalBtn');
+const mirrorBtn = document.getElementById('mirrorBtn');
+
+/* 🔑 TRUE screen sync using visualViewport */
+function syncToViewport() {
+    const vv = window.visualViewport;
+
+    const width = vv ? vv.width : window.innerWidth;
+    const height = vv ? vv.height : window.innerHeight;
+
+    document.body.style.width = width + "px";
+    document.body.style.height = height + "px";
+
+    info.textContent = `Screen: ${width} × ${height}`;
+}
+
+syncToViewport();
+
+window.addEventListener('resize', syncToViewport);
+window.addEventListener('orientationchange', () => {
+    setTimeout(syncToViewport, 100);
+});
+
+if (window.visualViewport) {
+    visualViewport.addEventListener('resize', syncToViewport);
+}
+
+/* Orientation lock attempt */
+async function tryLockOrientation() {
+    if (screen.orientation && screen.orientation.lock) {
+        try {
+            await screen.orientation.lock("portrait");
+        } catch {}
+    }
+}
+
+/* Start camera */
+async function startCamera(mirror) {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "user" },
+            audio: false
+        });
+
+        video.srcObject = stream;
+        video.style.transform = mirror ? "scaleX(-1)" : "scaleX(1)";
+
+        await tryLockOrientation();
+
+        normalBtn.style.display = "none";
+        mirrorBtn.style.display = "none";
+
+    } catch (err) {
+        alert("Camera failed: " + err.message);
+    }
+}
+
+normalBtn.onclick = () => startCamera(false);
+mirrorBtn.onclick = () => startCamera(true);
+</script>
+
+</body>
+</html>
