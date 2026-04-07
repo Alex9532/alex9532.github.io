@@ -2,75 +2,96 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+
+<!-- CRITICAL for drawing behind notch -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+
 <title>iOS Fullscreen Camera</title>
 
 <style>
-    html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        background: black;
-        overflow: hidden;
-    }
+html, body {
+    margin: 0;
+    padding: 0;
+    background: black;
+    overflow: hidden;
 
-    #container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: black;
-        overflow: hidden;
-    }
+    /* Helps iOS fill entire screen /
+    height: 100%;
+    height: -webkit-fill-available;
+}
 
-    video {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* fills screen without stretching */
-        background: black;
-        transform: scaleX(1);
-    }
+/ True fullscreen container /
+#container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
 
-    .controls {
-        position: absolute;
-        left: 0;
-        right: 0;
-        bottom: 24px;
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        z-index: 10;
-        padding: 0 16px;
-        box-sizing: border-box;
-    }
+    / Multiple fallbacks for iOS quirks /
+    height: 100vh;
+    height: -webkit-fill-available;
 
-    button {
-        padding: 14px 18px;
-        font-size: 16px;
-        border: none;
-        border-radius: 10px;
-        background: rgba(255,255,255,0.92);
-        color: black;
-    }
+    background: black;
+    overflow: hidden;
+}
 
-    #info {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        color: white;
-        font-size: 12px;
-        z-index: 10;
-        opacity: 0.8;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        pointer-events: none;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-    }
+/ Camera video /
+video {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover; / fill without stretching /
+    background: black;
+
+    transform: scaleX(1);
+}
+
+/ Overlay UI (does NOT affect layout) /
+.controls {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    right: 0;
+
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+
+    z-index: 20;
+}
+
+button {
+    padding: 14px 18px;
+    font-size: 16px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.9);
+    color: black;
+}
+
+/ Info overlay — floats above camera /
+#info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+
+    color: white;
+    font-size: 12px;
+    z-index: 20;
+
+    opacity: 0.85;
+    font-family: -apple-system, sans-serif;
+
+    pointer-events: none; / doesn't block touches /
+}
 </style>
 </head>
 
 <body>
+
 <div id="container">
     <video id="video" autoplay playsinline muted></video>
 
@@ -85,71 +106,82 @@
 <script>
 const container = document.getElementById('container');
 const video = document.getElementById('video');
-const normalBtn = document.getElementById('normalBtn');
-const mirrorBtn = document.getElementById('mirrorBtn');
 const info = document.getElementById('info');
 
-function setFullHeight() {
-    const h = window.innerHeight;
-    container.style.height = h + 'px';
+const normalBtn = document.getElementById('normalBtn');
+const mirrorBtn = document.getElementById('mirrorBtn');
+
+/ 🔑 Force TRUE screen height (fixes notch gaps) /
+function setRealHeight() {
+    const realHeight = window.innerHeight;
+
+    document.body.style.height = realHeight + "px";
+    container.style.height = realHeight + "px";
 }
 
+/ Update debug info /
 function updateInfo() {
-    info.textContent = `Screen: ${window.innerWidth} × ${window.innerHeight}`;
+    info.textContent =
+        "Screen: " + window.innerWidth + " × " + window.innerHeight;
 }
 
-setFullHeight();
+/ Run immediately /
+setRealHeight();
 updateInfo();
 
+/ Keep synced /
 window.addEventListener('resize', () => {
-    setFullHeight();
+    setRealHeight();
     updateInfo();
 });
 
 window.addEventListener('orientationchange', () => {
     setTimeout(() => {
-        setFullHeight();
+        setRealHeight();
         updateInfo();
-    }, 100);
+    }, 120);
 });
 
-async function tryLockOrientation() {
+/ Attempt orientation lock /
+async function lockOrientation() {
     if (screen.orientation && screen.orientation.lock) {
         try {
-            await screen.orientation.lock('portrait');
+            await screen.orientation.lock("portrait");
         } catch (e) {
-            // iOS may ignore this even in standalone mode
+            // iOS may ignore this
         }
     }
 }
 
+/ Start camera /
 async function startCamera(mirror) {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
             video: {
-                facingMode: "user",
-                width: { ideal: 1920 },
-                height: { ideal: 1080 }
+                facingMode: "user"
             },
             audio: false
         });
 
         video.srcObject = stream;
+
+        / Mirror toggle /
         video.style.transform = mirror ? "scaleX(-1)" : "scaleX(1)";
 
-        await tryLockOrientation();
+        await lockOrientation();
 
-        normalBtn.style.display = 'none';
-        mirrorBtn.style.display = 'none';
+        normalBtn.style.display = "none";
+        mirrorBtn.style.display = "none";
 
     } catch (err) {
         alert("Camera access failed: " + err.message);
-        console.error(err);
     }
 }
 
-normalBtn.addEventListener('click', () => startCamera(false));
-mirrorBtn.addEventListener('click', () => startCamera(true));
+/ Buttons */
+normalBtn.onclick = () => startCamera(false);
+mirrorBtn.onclick = () => startCamera(true);
 </script>
+
 </body>
 </html>
