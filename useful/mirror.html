@@ -3,35 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>iOS Fullscreen Camera</title>
+<title>Fullscreen Camera iOS</title>
 
 <style>
 html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
     background: black;
     overflow: hidden;
 }
 
+/* Force true full screen /
 #container {
     position: fixed;
-    inset: 0;
+    width: 100vw;
+    height: 100dvh; / KEY FIX /
+    top: 0;
+    left: 0;
+    background: black;
 }
 
-/* Camera video /
+/ Video fills everything /
 video {
     width: 100%;
     height: 100%;
-    object-fit: cover; / no stretching /
-    background: black;
-    transform: scaleX(1); / default normal /
+    object-fit: cover;
+    transform: scaleX(1);
 }
 
-/ Buttons */
+/ Controls */
 .controls {
     position: absolute;
-    bottom: 30px;
+    bottom: 40px;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -42,10 +45,9 @@ video {
 button {
     padding: 14px 18px;
     font-size: 15px;
-    border: none;
     border-radius: 10px;
+    border: none;
     background: rgba(255,255,255,0.9);
-    color: black;
 }
 </style>
 </head>
@@ -66,7 +68,7 @@ const video = document.getElementById('video');
 const normalBtn = document.getElementById('normalBtn');
 const mirrorBtn = document.getElementById('mirrorBtn');
 
-async function startCamera(mirrored) {
+async function startCamera(mirror) {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({
             video: {
@@ -77,21 +79,19 @@ async function startCamera(mirrored) {
 
         video.srcObject = stream;
 
-        // Apply mirror or normal
-        video.style.transform = mirrored ? "scaleX(-1)" : "scaleX(1)";
+        // Mirror toggle
+        video.style.transform = mirror ? "scaleX(-1)" : "scaleX(1)";
 
-        // Hide buttons after starting
         normalBtn.style.display = "none";
         mirrorBtn.style.display = "none";
 
-    } catch (err) {
-        alert("Camera error: " + err.message);
-        console.error(err);
+    } catch (e) {
+        alert("Camera failed: " + e.message);
     }
 }
 
-normalBtn.addEventListener("click", () => startCamera(false));
-mirrorBtn.addEventListener("click", () => startCamera(true));
+normalBtn.onclick = () => startCamera(false);
+mirrorBtn.onclick = () => startCamera(true);
 </script>
 
 </body>
