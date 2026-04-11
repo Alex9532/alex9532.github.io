@@ -66,7 +66,7 @@
         padding: 14px 18px;
         font-size: 16px;
         border: none;
-        border-radius: 10px;
+        border-radius: 25px;
         background: rgba(255,255,255,0.92);
         color: black;
         -webkit-appearance: none;
@@ -91,6 +91,7 @@
 <body>
 <div id="container">
     <video id="video" autoplay playsinline muted></video>
+
 
     <div id="info"></div>
 
@@ -117,7 +118,7 @@ function syncViewportHeight() {
 }
 
 function updateInfo() {
-    info.textContent = `Screen: ${window.innerWidth} × ${window.innerHeight}`;
+    //info.textContent = `scrsize: ${window.innerWidth} by ${window.innerHeight} ok?`;
 }
 
 syncViewportHeight();
