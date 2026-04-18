@@ -7,10 +7,15 @@
         "warnOnUnsupportedContent": true, 
         "autoplay": "on", 
         "unmuteOverlay": "hidden"
+		"preloader": "false"
+	    "splashScreen": "false"
     };
 	window.RufflePlayer.requestFullscreen()
 </script>
-<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+<script src="https://unpkg.com/@ruffle-rs/ruffle">
+	    window.RufflePlayer = window.RufflePlayer || {};
+	    window.RufflePlayer.requestFullscreen()
+</script>
 <object id="header_flash" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="100vw" height="100vh">
 	        <param name="movie" value="https://alex9532.github.io/flash/ducklife/game.swf" />
 	        <param name="wmode" value="transparent" />
