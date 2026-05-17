@@ -1,6 +1,7 @@
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
+  // For https://alex9532/wctvps/claudenowtries/index.html
   // Serve connect.html for any .../connect/* path under our scope.
   // CRITICAL: this page must NOT be cross-origin isolated, so we set
   // COEP: unsafe-none here — the opposite of every other route.
