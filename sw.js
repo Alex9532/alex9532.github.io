@@ -1,10 +1,6 @@
-// Served from alex9532.github.io/sw.js — scope is /
-
 const APP_PATH = '/wcptvs/claudenowtries/';
 
-// The full connect page HTML, inlined so we never need to fetch it from
-// another URL. This avoids any navigation that would clear window.opener.
-const CONNECT_HTML = `<!DOCTYPE html>
+const CONNECT_HTML = (serverUrl) => `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><title>Connecting…</title>
 <style>
@@ -15,11 +11,25 @@ justify-content:center;background:#0d0f12;font-family:monospace;color:#545b6b;fo
 <body>
 <span>connecting…</span>
 <script type="module">
+// Proxy window.location so pathname appears as /webcontainer/connect/direct
+// while the page stays on its actual URL (keeping window.opener intact).
+const _realLocation = window.location;
+const fakeLocation = new Proxy(_realLocation, {
+  get(target, prop) {
+    if (prop === 'pathname') return '/webcontainer/connect/direct';
+    const val = target[prop];
+    return typeof val === 'function' ? val.bind(target) : val;
+  }
+});
+Object.defineProperty(window, 'location', {
+  get: () => fakeLocation,
+  configurable: true,
+});
+
 import{setupConnect}from'https://esm.sh/@webcontainer/api/connect';
-const p=new URLSearchParams(window.location.search);
-const serverUrl=p.get('serverUrl');
 await setupConnect();
-if(serverUrl)window.location.replace(serverUrl);
+const serverUrl = ${JSON.stringify(serverUrl)};
+if(serverUrl) _realLocation.replace(serverUrl);
 <\/script>
 </body>
 </html>`;
@@ -28,16 +38,9 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Serve the inlined connect page at /webcontainer/connect/* with COEP:unsafe-none.
-  // Because it's inlined, no extra fetch is needed — opener is preserved.
   if (url.pathname.startsWith('/webcontainer/connect/')) {
-    // Forward serverUrl query param into the response
     const serverUrl = url.searchParams.get('serverUrl') || '';
-    const html = CONNECT_HTML.replace(
-      "const serverUrl=p.get('serverUrl');",
-      `const serverUrl=${JSON.stringify(serverUrl)};`
-    );
-    event.respondWith(new Response(html, {
+    event.respondWith(new Response(CONNECT_HTML(serverUrl), {
       status: 200,
       headers: {
         'Content-Type': 'text/html',
@@ -48,7 +51,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // App pages — inject COOP + COEP
   if (url.pathname.startsWith(APP_PATH)) {
     event.respondWith(
       fetch(event.request).then((res) => {
