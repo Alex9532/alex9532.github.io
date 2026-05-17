@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Not Found</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0a0a0b;
+      --surface: #111114;
+      --border:  #1e1e24;
+      --text:    #c2c2cc;
+      --dim:     #44444e;
+      --accent:  #e8ff47;
+      --mono:    'DM Mono', monospace;
+      --display: 'Syne', sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 40px clamp(24px, 6vw, 80px);
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+    }
+
+    .nav-brand {
+      font-family: var(--display);
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-link {
+      font-size: 12px;
+      color: var(--dim);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .nav-link:hover { color: var(--text); }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 0;
+    }
+
+    .code {
+      font-family: var(--display);
+      font-size: clamp(120px, 22vw, 220px);
+      font-weight: 800;
+      line-height: 0.85;
+      letter-spacing: -0.04em;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--border);
+      position: relative;
+      user-select: none;
+      margin-bottom: 48px;
+    }
+
+    /* Accent fill that animates in */
+    .code::after {
+      content: '404';
+      position: absolute;
+      inset: 0;
+      color: var(--accent);
+      -webkit-text-stroke: 0;
+      clip-path: inset(100% 0 0 0);
+      animation: reveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+    }
+
+    @keyframes reveal {
+      to { clip-path: inset(0% 0 0 0); }
+    }
+
+    .message {
+      font-size: clamp(14px, 2vw, 17px);
+      color: var(--text);
+      max-width: 480px;
+      line-height: 1.7;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fade-up 0.6s ease 0.7s forwards;
+    }
+
+    @keyframes fade-up {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .path {
+      display: inline-block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 8px;
+      font-size: 13px;
+      color: var(--accent);
+      word-break: break-all;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 36px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fade-up 0.6s ease 0.9s forwards;
+    }
+
+    .btn {
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 10px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0a0b;
+      font-weight: 400;
+    }
+    .btn-primary:hover { background: #f5ff80; }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .btn-ghost:hover { border-color: var(--dim); }
+
+    footer {
+      font-size: 11px;
+      color: var(--dim);
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Decorative grid lines */
+    .grid-lines {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 80px 80px;
+      opacity: 0.3;
+      pointer-events: none;
+      mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-lines"></div>
+
+  <div class="wrap">
+    <nav>
+      <a class="nav-brand" href="/">alex9532</a>
+      <a class="nav-link" href="/">← home</a>
+    </nav>
+
+    <main>
+      <div class="code">404</div>
+
+      <p class="message">
+        The page <span class="path" id="path-display"></span> doesn't exist or has been moved.
+      </p>
+
+      <div class="actions">
+        <a class="btn btn-primary" href="/">go home</a>
+        <button class="btn btn-ghost" onclick="history.back()">go back</button>
+      </div>
+    </main>
+
+    <footer>
+      alex9532.github.io &mdash; page not found
+    </footer>
+  </div>
+
+  <script>
+    // Show the requested path
+    document.getElementById('path-display').textContent = window.location.pathname;
+
+    // Silently handle WebContainer connect redirects without showing the 404 UI
+    if (window.location.pathname.startsWith('/webcontainer/connect/')) {
+      // SW is now active at root scope — just reload and the SW will intercept
+      document.querySelector('.wrap').style.visibility = 'hidden';
+      window.location.reload();
+    }
+  </script>
+</body>
+</html>

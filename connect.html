@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Connecting…</title>
+<style>
+  body { margin:0; min-height:100vh; display:flex; align-items:center;
+    justify-content:center; background:#0d0f12; font-family:monospace;
+    color:#545b6b; font-size:13px; }
+</style>
+</head>
+<body>
+<span>connecting…</span>
+<script type="module">
+  // This page is served by the SW at the real /webcontainer/connect/<token> path.
+  // window.opener is set because index.html opens it via window.open().
+  // Both conditions setupConnect() requires are now met.
+  import { setupConnect } from 'https://esm.sh/@webcontainer/api/connect';
+  await setupConnect();
+</script>
+</body>
+</html>
