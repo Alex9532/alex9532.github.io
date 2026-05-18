@@ -1,24 +1,45 @@
 const APP_PATH = '/wcptvs/claudenowtries/';
 let patchedConnectJs = null;
 
-// Fetch and patch connect.js once, removing the pathname check entirely
 async function getPatchedConnectJs() {
   if (patchedConnectJs) return patchedConnectJs;
+  // Use the stable versioned URL so there are no redirects to follow
+  const urls = [
+    'https://esm.sh/@webcontainer/api@1.6.1/connect',
+    'https://esm.sh/@webcontainer/api/connect',
+  ];
+  let src = null;
+  for (const url of urls) {
+    try {
+      const res = await fetch(url, { redirect: 'follow' });
+      if (res.ok) { src = await res.text(); break; }
+    } catch(e) {}
+  }
+  if (!src) throw new Error('Could not fetch connect.js');
 
-  const res = await fetch('https://esm.sh/@webcontainer/api/connect');
-  let src = await res.text();
-
-  // The pathname check looks like: pathname.startsWith("/webcontainer/connect")
-  // or location.pathname — patch it to always return true
+  // Patch out the pathname check — find any string comparison against
+  // "/webcontainer/connect" and replace it with a truthy literal.
+  // The minified source uses patterns like:
+  //   n.pathname.startsWith("/webcontainer/connect")
+  //   /\/webcontainer\/connect/.test(n.pathname)
   src = src
-    .replace(/[a-z_$]+\.pathname\.startsWith\(["'`]\/webcontainer\/connect["'`]\)/g, 'true')
-    .replace(/["'`]\/webcontainer\/connect["'`]\.test\([^)]+\)/g, 'true')
-    // Also handle any regex test on the pathname
-    .replace(/\/\\\/webcontainer\\\/connect\/[a-z]*\.test\([^)]+\)/g, 'true');
+    .replace(/\w+\.pathname\.startsWith\(["'`]\/webcontainer\/connect["'`]\)/g, 'true')
+    .replace(/\/\\\/webcontainer\\\/connect[^/]*\/[a-z]*\.test\(\w+\.pathname\)/g, 'true')
+    .replace(/["'`]\/webcontainer\/connect["'`]\.test\(\w+\.pathname\)/g, 'true');
 
   patchedConnectJs = src;
   return src;
 }
+
+// Pre-fetch on SW install so it's ready before first use
+self.addEventListener('install', (event) => {
+  event.waitUntil(getPatchedConnectJs().catch(() => {}));
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
 
 const CONNECT_HTML = (serverUrl) => `<!DOCTYPE html>
 <html>
@@ -30,12 +51,10 @@ justify-content:center;background:#0d0f12;font-family:monospace;color:#545b6b;fo
 </head>
 <body><span>connecting…</span>
 <script type="module">
-// Import the patched connect.js served by our own SW at /wc-connect.js
-// This version has the pathname check removed so it works from any path.
-import { setupConnect } from '/wc-connect.js';
+import{setupConnect}from'/wc-connect.js';
 await setupConnect();
-const serverUrl = ${JSON.stringify(serverUrl)};
-if (serverUrl) window.location.replace(serverUrl);
+const serverUrl=${JSON.stringify(serverUrl)};
+if(serverUrl)window.location.replace(serverUrl);
 <\/script>
 </body>
 </html>`;
@@ -44,21 +63,21 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
 
-  // Serve the patched connect.js
+  // Serve the patched connect.js at a stable same-origin path
   if (url.pathname === '/wc-connect.js') {
     event.respondWith(
       getPatchedConnectJs().then(src => new Response(src, {
         status: 200,
-        headers: {
-          'Content-Type': 'application/javascript',
-          'Cross-Origin-Resource-Policy': 'same-origin',
-        }
+        headers: { 'Content-Type': 'application/javascript' }
+      })).catch(e => new Response(`throw new Error(${JSON.stringify(e.message)})`, {
+        status: 500,
+        headers: { 'Content-Type': 'application/javascript' }
       }))
     );
     return;
   }
 
-  // Serve the connect page at /webcontainer/connect/*
+  // Serve inlined connect page at /webcontainer/connect/*
   if (url.pathname.startsWith('/webcontainer/connect/')) {
     const serverUrl = url.searchParams.get('serverUrl') || '';
     event.respondWith(new Response(CONNECT_HTML(serverUrl), {
