@@ -1,0 +1,22 @@
+<script>
+  var Module = {
+    canvas: document.getElementById('canvas'),
+    arguments: [
+      'simpbowl',
+      '-rompath', '/sb',
+      '-mouse',
+      '-autoframeskip',
+      '-noautosave',
+      '-window'
+    ],
+  
+    preRun: [function() {
+      FS.mkdir('/sb');
+      FS.mkdir('/sb/simpbowl');
+      FS.createPreloadedFile('/sb', 'konamigv.zip', './tsimpbowling/konamigv.zip', true, false);
+      FS.createPreloadedFile('/sb', 'simpbowl.zip', './tsimpbowling/simpbowl.zip', true, false);
+      FS.createPreloadedFile('/sb/simpbowl', '829uaa02.chd', './tsimpbowling/829uaa02.chd', true, false);
+    }]
+  };
+</script>
+<script async type="text/javascript" src="simpbowl.js"></script>
