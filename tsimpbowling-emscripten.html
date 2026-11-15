@@ -1,6 +1,10 @@
+<canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+
 <script>
   var Module = {
-    canvas: document.getElementById('canvas'),
+    get canvas() {
+      return document.getElementById('canvas');
+    },
     arguments: [
       'simpbowl',
       '-rompath', '/sb',
