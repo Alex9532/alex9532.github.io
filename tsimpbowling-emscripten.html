@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
 <style>
   html, body {
     margin: 0;
@@ -24,6 +21,7 @@
   /* Left side: Game screen area */
   #screen-area {
     flex: 1;
+    min-width: 0; /* Prevents flexbox from shrinking weirdly */
     height: 100%;
     display: flex;
     align-items: center;
@@ -32,20 +30,22 @@
     overflow: hidden;
   }
 
-  /* !important prevents Emscripten SDL from overriding canvas size */
+  /* Fills the maximum possible 4:3 space without clipping or focus borders */
   #canvas {
-    width: auto !important;
+    width: 100% !important;
     height: 100% !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
+    object-fit: contain !important;
     aspect-ratio: 4 / 3;
+    outline: none !important; /* Removes the blue focus ring */
+    border: none !important;
     display: block;
     background: #000;
   }
 
   /* Right side: Your custom controls sidebar */
   #controls-sidebar {
-    width: 320px;
+    width: 280px; /* Slightly narrower to give the game screen more room */
+    flex-shrink: 0;
     height: 100%;
     box-sizing: border-box;
     padding: 20px;
@@ -72,7 +72,7 @@
     background: #3182ce;
   }
 
-  /* Fullscreen overrides: Hide sidebar so #screen-area expands and recenters */
+  /* Fullscreen overrides */
   #game-container:fullscreen #controls-sidebar {
     display: none;
   }
@@ -82,67 +82,3 @@
     height: 100vh;
   }
 </style>
-</head>
-<body>
-
-<div id="game-container">
-  <!-- Left: MAME Canvas -->
-  <div id="screen-area">
-    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
-  </div>
-
-  <!-- Right: Controls Sidebar -->
-  <div id="controls-sidebar">
-    <button id="fs-btn" onclick="enterFullscreen()">Fullscreen</button>
-    
-    <!-- Add your custom buttons, instructions, or controls below -->
-    <div id="custom-controls">
-      <h3>Controls</h3>
-      <p>Your custom controls go here.</p>
-    </div>
-  </div>
-</div>
-
-<script>
-  var container = document.getElementById('game-container');
-  var canvasElement = document.getElementById('canvas');
-
-  var Module = {
-    canvas: canvasElement,
-    arguments: [
-      'simpbowl',
-      '-rompath', '/sb',
-      '-mouse',
-      '-autoframeskip',
-      '-noautosave',
-      '-window',
-      '-video', 'soft'
-    ],
-    preRun: [function() {
-      FS.mkdir('/sb');
-      FS.mkdir('/sb/simpbowl');
-      FS.createPreloadedFile('/sb', 'konamigv.zip', './tsimpbowling/konamigv.zip', true, false);
-      FS.createPreloadedFile('/sb', 'simpbowl.zip', './tsimpbowling/simpbowl.zip', true, false);
-      FS.createPreloadedFile('/sb/simpbowl', '829uaa02.chd', './tsimpbowling/829uaa02.chd', true, false);
-    }]
-  };
-
-  function enterFullscreen() {
-    if (container.requestFullscreen) {
-      container.requestFullscreen();
-    } else if (container.webkitRequestFullscreen) {
-      container.webkitRequestFullscreen();
-    }
-    canvasElement.focus();
-  }
-
-  canvasElement.addEventListener('click', function() {
-    canvasElement.focus();
-    if (document.fullscreenElement && canvasElement.requestPointerLock) {
-      canvasElement.requestPointerLock();
-    }
-  });
-</script>
-<script async type="text/javascript" src="simpbowl.js"></script>
-</body>
-</html>
