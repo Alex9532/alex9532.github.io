@@ -1,9 +1,45 @@
+<head>
+  <style>
+    body {
+      margin: 0;
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    canvas.emscripten {
+      border: 0;
+      background-color: black;
+      display: block;
+    }
+
+    /* Ensures the canvas fills the screen cleanly without stretching */
+    canvas.emscripten:fullscreen {
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+    }
+
+    #fs-btn {
+      margin-top: 12px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
 <body>
   <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+  <button id="fs-btn" onclick="goFullscreen()">Fullscreen (Lock Mouse)</button>
 
   <script>
+    var canvasElement = document.getElementById('canvas');
+
     var Module = {
-      canvas: document.getElementById('canvas'),
+      canvas: canvasElement,
       arguments: [
         'simpbowl',
         '-rompath', '/sb',
@@ -21,6 +57,17 @@
         FS.createPreloadedFile('/sb/simpbowl', '829uaa02.chd', './tsimpbowling/829uaa02.chd', true, false);
       }]
     };
+
+    function goFullscreen() {
+      // First 'true' locks the mouse pointer (ideal for trackball games like Simpsons Bowling)
+      // Second 'true' resizes the canvas to match your monitor resolution
+      if (Module.requestFullscreen) {
+        Module.requestFullscreen(true, true);
+      } else {
+        canvasElement.requestFullscreen();
+      }
+      canvasElement.focus();
+    }
   </script>
   <script async type="text/javascript" src="simpbowl.js"></script>
 </body>
