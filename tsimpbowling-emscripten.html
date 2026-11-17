@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html>
+<head>
 <style>
   html, body {
     margin: 0;
@@ -82,3 +85,67 @@
     height: 100vh;
   }
 </style>
+</head>
+<body>
+
+<div id="game-container">
+  <!-- Left: MAME Canvas -->
+  <div id="screen-area">
+    <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+  </div>
+
+  <!-- Right: Controls Sidebar -->
+  <div id="controls-sidebar">
+    <button id="fs-btn" onclick="enterFullscreen()">Fullscreen</button>
+    
+    <!-- Add your custom buttons, instructions, or controls below -->
+    <div id="custom-controls">
+      <h3>Controls</h3>
+      <p>Your custom controls go here.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  var container = document.getElementById('game-container');
+  var canvasElement = document.getElementById('canvas');
+
+  var Module = {
+    canvas: canvasElement,
+    arguments: [
+      'simpbowl',
+      '-rompath', '/sb',
+      '-mouse',
+      '-autoframeskip',
+      '-noautosave',
+      '-window',
+      '-video', 'soft'
+    ],
+    preRun: [function() {
+      FS.mkdir('/sb');
+      FS.mkdir('/sb/simpbowl');
+      FS.createPreloadedFile('/sb', 'konamigv.zip', './tsimpbowling/konamigv.zip', true, false);
+      FS.createPreloadedFile('/sb', 'simpbowl.zip', './tsimpbowling/simpbowl.zip', true, false);
+      FS.createPreloadedFile('/sb/simpbowl', '829uaa02.chd', './tsimpbowling/829uaa02.chd', true, false);
+    }]
+  };
+
+  function enterFullscreen() {
+    if (container.requestFullscreen) {
+      container.requestFullscreen();
+    } else if (container.webkitRequestFullscreen) {
+      container.webkitRequestFullscreen();
+    }
+    canvasElement.focus();
+  }
+
+  canvasElement.addEventListener('click', function() {
+    canvasElement.focus();
+    if (document.fullscreenElement && canvasElement.requestPointerLock) {
+      canvasElement.requestPointerLock();
+    }
+  });
+</script>
+<script async type="text/javascript" src="simpbowl.js"></script>
+</body>
+</html>
